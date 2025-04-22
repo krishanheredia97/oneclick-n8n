@@ -1,6 +1,5 @@
 @echo off
 setlocal EnableDelayedExpansion
-
 :: ========== USER CONFIGURABLE VARIABLES ==========
 set "AUTO_OPEN=true"
 set "NGROK_DOMAIN=your_domain_here"
@@ -15,12 +14,16 @@ if not exist "%NGROK_PATH%" (
     goto end
 )
 
-:: Launch Windows Terminal with two panes: one for ngrok, one for n8n with WEBHOOK_URL
-wt ^
-    nt -p "Ngrok" cmd /k "\"%NGROK_PATH%\" http --url=%NGROK_DOMAIN% %N8N_PORT%" ^
-    ; split-pane -H -p "n8n" cmd /k "set WEBHOOK_URL=https://%NGROK_DOMAIN%/& n8n start"
+:: Start ngrok in its own window
+start "Ngrok" cmd /k "title Ngrok && "%NGROK_PATH%" http --url=%NGROK_DOMAIN% %N8N_PORT%"
 
-:: Wait for ngrok to be ready before opening the browser
+:: Wait a moment for ngrok to start
+timeout /t 2 /nobreak > nul
+
+:: Start n8n in its own window with the environment variable set
+start "n8n" cmd /k "title n8n && set WEBHOOK_URL=https://%NGROK_DOMAIN%/ && n8n start"
+
+:: Wait for services to be ready before opening the browser
 timeout /t %STARTUP_TIMEOUT% /nobreak > nul
 
 :: Optional: open formatted URL
@@ -29,5 +32,3 @@ if /I "%AUTO_OPEN%"=="true" (
 )
 
 :end
-
-ngrok http --url=pipefish-pet-husky.ngrok-free.app 80
