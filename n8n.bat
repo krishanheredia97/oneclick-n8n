@@ -34,7 +34,7 @@ if not exist "%NGROK_PATH%" (
 :: Launch Windows Terminal with two panes: one for ngrok, one for n8n with WEBHOOK_URL
 wt ^
     -p "Ngrok" cmd /k "%NGROK_PATH% http --url=%NGROK_DOMAIN% %N8N_PORT%" ^
-    ; split-pane -H -p "n8n" cmd /k "set WEBHOOK_URL=https://%NGROK_DOMAIN%/ && n8n start"
+    ; split-pane -H -p "n8n" cmd /k "set WEBHOOK_URL=https://%NGROK_DOMAIN%&& n8n start"
 
 :: Wait for ngrok to be ready before opening the browser
 timeout /t %STARTUP_TIMEOUT% /nobreak > nul
